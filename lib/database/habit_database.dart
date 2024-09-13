@@ -99,6 +99,50 @@ class HabitDatabase extends ChangeNotifier {
     readHabit();
   }
 
+// update -check habit on and off
+
+  Future<void> updateHabitCompletion(int id, bool isCompleted) async {
+    // fined the specific habit
+    final habit = await isar.habitats.get(id);
+
+    if (habit != null) {
+      await isar.writeTxn(
+        () async {
+          // if habit completed -> add the current date to the completedDays list
+
+          if (isCompleted && !habit.completedDayes.contains(DateTime.now())) {
+            // today
+            final today = DateTime.now();
+            // add the current date to the list if it is not already in the list
+            habit.completedDayes.add(
+              DateTime(
+                today.year,
+                today.month,
+                today.day,
+              ),
+            );
+          } else {
+            // if habit in Not completed, remove the current date from the list
+
+            // remove the current date from the list if the habit is marked as completed
+
+            habit.completedDayes.removeWhere(
+              (date) =>
+                  date.year == DateTime.now().year &&
+                  date.month == DateTime.now().month &&
+                  date.day == DateTime.now().day,
+            );
+          }
+          // save the updated habit back to database
+          await isar.habitats.put(habit);
+        },
+      );
+    }
+    // update complation status
+
+    // re-read from db
+  }
+
   // delete a habit
   Future<void> deleteHabit(int id) async {
     await isar.writeTxn(
