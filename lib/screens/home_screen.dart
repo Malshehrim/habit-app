@@ -75,15 +75,92 @@ class _HomeScreenState extends State<HomeScreen> {
   void checkHabitOnOff(bool? value, Habitat habit) {
 // update habit complation status
 
-    if (value != habit) {
-      value != habit;
+    if (value != null) {
+      context.read<HabitDatabase>().updateHabitCompletion(habit.id, value);
     }
+  }
+
+// edit habit box
+  void editHabitBox(Habitat habit) {
+    // set the contoller's text to the habit's current name
+    textFieldController.text == habit.name;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: TextField(
+          controller: textFieldController,
+        ),
+        actions: [
+          // save buton
+          MaterialButton(
+            onPressed: () {
+              String habitName = textFieldController.text;
+
+              context
+                  .read<HabitDatabase>()
+                  .updateHabitName(habit.id, habitName);
+
+              // pop box
+              Navigator.of(context).pop();
+              textFieldController.clear();
+            },
+            child: const Text('Save '),
+          ),
+
+          // cancel button
+
+          MaterialButton(
+            onPressed: () {
+              // pop
+
+              Navigator.of(context).pop();
+              textFieldController.clear();
+            },
+            child: const Text('Cancle'),
+          ),
+        ],
+      ),
+    );
+  }
+
+//delete habit box
+
+  void deleteHabit(Habitat habit) {
+    // delete button
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure you want to delete?'),
+        actions: [
+          // delete button
+          MaterialButton(
+            onPressed: () {
+              context.read<HabitDatabase>().deleteHabit(habit.id);
+              // pop after delete
+              Navigator.of(context).pop();
+            },
+            child: const Text('Delete'),
+          ),
+
+          //cancel button
+          MaterialButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       drawer: const MainDrawer(),
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
@@ -121,6 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
           isCompleted: isCompletedToday,
           text: habit.name,
           onChanged: (value) => checkHabitOnOff(value, habit),
+          editHabit: (context) => editHabitBox(habit),
+          deletHabit: (context) => deleteHabit(habit),
         );
       },
     );

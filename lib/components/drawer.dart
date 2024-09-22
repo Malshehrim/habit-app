@@ -14,7 +14,7 @@ class MainDrawer extends StatelessWidget {
         child: CupertinoSwitch(
           value: Provider.of<ThemeProvider>(context).isDarkMode,
           onChanged: (value) =>
-              Provider.of<ThemeProvider>(context, listen: false).toggelTheme,
+              Provider.of<ThemeProvider>(context, listen: false).toggelTheme(),
         ),
       ),
     );

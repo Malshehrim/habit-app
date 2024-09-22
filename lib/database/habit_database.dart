@@ -15,7 +15,7 @@ class HabitDatabase extends ChangeNotifier {
         directory: dir.path);
   }
 
-// Save first app lunched
+// Save first app lunche
   static Future<void> saveFirstAppLunched() async {
     final existingSettings = await isar.appSettings.where().findAll();
     if (existingSettings.isEmpty) {
@@ -69,10 +69,41 @@ class HabitDatabase extends ChangeNotifier {
 
     // update complation status
     if (habit != null) {
-      await isar.writeTxn(() async {});
+      await isar.writeTxn(
+        () async {
+          // if habit is completed -> add the current data to copleatDay list
+
+          if (isCompleted && !habit.completedDayes.contains(DateTime.now())) {
+            // today
+
+            final today = DateTime.now();
+
+            //add the current data to copleatDay list if it is already in copleatDay list
+            habit.completedDayes.add(
+              DateTime(
+                today.year,
+                today.month,
+                today.day,
+              ),
+            );
+
+            // if habit is not completed remove the current data from copleatDay list
+          } else {
+            habit.completedDayes.removeWhere(
+              (date) =>
+                  date.year == DateTime.now().year &&
+                  date.month == DateTime.now().month &&
+                  date.day == DateTime.now().day,
+            );
+          }
+        },
+      );
+      // save the updated habit to db
+      await isar.habitats.put(habit);
     }
 
     // re-read form db
+    readHabit();
   }
 
   // upeate a habit- name
@@ -141,6 +172,7 @@ class HabitDatabase extends ChangeNotifier {
     // update complation status
 
     // re-read from db
+    readHabit();
   }
 
   // delete a habit

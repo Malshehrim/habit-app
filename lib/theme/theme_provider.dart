@@ -13,6 +13,7 @@ class ThemeProvider extends ChangeNotifier {
 
   // current mode is dark
 
+// for the value in the CupertinoSwitch
   bool get isDarkMode => _themeData == darkMode;
 
 //setter
